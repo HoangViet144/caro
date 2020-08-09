@@ -1,4 +1,4 @@
-import tkinter as tk
+ort tkinter as tk
 from functools import partial
 import threading
 import socket
