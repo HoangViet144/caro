@@ -99,8 +99,41 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         
         return act
 
-def heuristic(currBoard,playerID,action):
+def heuristic(currBoard,playerID):
     score = 0
+    if (playerID==Player.HUMAN):
+        score+=1
+    else:
+        score-=1
     if (currBoard.isWin(playerID)):
-        score += 999999
-    if (currBoard)
+        if (playerID==Player.HUMAN):
+            score+=99_999_999
+        else:
+            score-=99_999_999
+    
+    for i in range(currBoard.countThreeContinousNoBound(playerID)):
+        if (playerID==Player.HUMAN):
+            score+=100
+        else:
+            score-=100
+
+    for i in range(currBoard.countThreeContinousBound(playerID)):
+        if (playerID==Player.HUMAN):
+            score+=80
+        else: 
+            score-=80
+    
+    for i in range(currBoard.countTwoContinousNoBound(playerID)):
+        if (playerID==Player.HUMAN):
+            score+=30
+        else:
+            score-=30
+    
+    for i in range(currBoard.countTwoContinousBound(playerID)):
+        if (playerID==Player.HUMAN):
+            score+=10
+        else:
+            score-=10
+    
+
+    return score
