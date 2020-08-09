@@ -112,7 +112,8 @@ class BoardVisualizaion(tk.Tk):
         self.frameControl = frameControl
         self.frameLabel = frameLabel
 
-        switchButton = tk.Button(frameControl, text="Switch turn", width=10, command=partial(self.switchTurn))
+        switchButton = tk.Button(
+            frameControl, text="Switch turn", width=10, command=partial(self.switchTurn))
         switchButton.grid(row=0, column=0, padx=30)
         for x in range(self.height):
             for y in range(self.width):
@@ -141,18 +142,29 @@ class BoardVisualizaion(tk.Tk):
             if returnVal == 1:
                 self.noti("Winner is", "Player 1")
                 self.newGame()
+                return
             elif returnVal == 0:
                 self.noti("Winner is", "Player 0")
                 self.newGame()
+                return
             self.validCurrentMove = True
             self.prevTurn = self.currentTurn
         else:
             self.noti("", "not empty cell")
             self.validCurrentMove = False
+        print("c", self.currentTurn)
         if self.gameType == 1:
             print("Ai turn")
-            act = self.agent.getLocation(self.board)
-            print(act)
+            x, y = self.agent.getLocation(self.board)
+            self.handleButton(x, y, 0)
+
+            self.board.makeMove(x, y, 0)
+            self.prevTurn = 0
+            #self.currentTurn ^= 1
+            #print("turn", self.currentTurn)
+        print("board turn", self.board.currentTurn)
+        print("visual turn", self.currentTurn)
+        print("map", self.board.board)
 
     def handleButton(self, x, y, playerId):
         if playerId == 1:
@@ -169,7 +181,10 @@ class BoardVisualizaion(tk.Tk):
         for x in range(self.height):
             for y in range(self.width):
                 self.button[x][y]['text'] = ""
-        self.board.currentTurn = 1
+        self.board.newGame()
+        self.currentTurn = 1
+        self.prevTurn = 0
+        self.validCurrentMove = True
 
 
 class Board():
