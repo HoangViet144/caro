@@ -112,8 +112,7 @@ class BoardVisualizaion(tk.Tk):
         self.frameControl = frameControl
         self.frameLabel = frameLabel
 
-        switchButton = tk.Button(frameControl, text="Switch turn", width=10, command=partial(
-            self.switchTurn))
+        switchButton = tk.Button(frameControl, text="Switch turn", width=10, command=partial(self.switchTurn))
         switchButton.grid(row=0, column=0, padx=30)
         for x in range(self.height):
             for y in range(self.width):
@@ -153,6 +152,7 @@ class BoardVisualizaion(tk.Tk):
         if self.gameType == 1:
             print("Ai turn")
             act = self.agent.getLocation(self.board)
+            print(act)
 
     def handleButton(self, x, y, playerId):
         if playerId == 1:
@@ -459,7 +459,7 @@ class Board():
             return True
         return False
 
-    def isTwoContinous(self, x, y, playerId):
+    def isTwoContinous(self, x, y, playerId, opt):
         # opt 1: no bound
         # opt 2: bound
         if x < 0 or x >= self.width or y < 0 or y >= self.height:
