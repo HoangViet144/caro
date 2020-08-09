@@ -13,6 +13,7 @@ from PIL import Image, ImageTk
 from agents import MultiAgentSearchAgent
 from agents import MinimaxAgent
 from agents import AlphaBetaAgent
+from agents import LookupTableAgent
 
 
 class Player():
@@ -100,6 +101,7 @@ class BoardVisualizaion(tk.Tk):
         self.currentTurn = 1
         self.prevTurn = 0
         self.validCurrentMove = True
+        self.numOfTurn = 0
 
     def buildFrame(self):
         frameLabel = tk.Frame(self)
@@ -152,19 +154,27 @@ class BoardVisualizaion(tk.Tk):
         else:
             self.noti("", "not empty cell")
             self.validCurrentMove = False
+            return
         print("c", self.currentTurn)
         if self.gameType == 1:
             print("Ai turn")
-            x, y = self.agent.getLocation(self.board)
+            if self.numOfTurn >= 2:
+                x, y = self.agent.getLocation(self.board)
+            else:
+                naiveAgent = LookupTableAgent()
+                x, y = naiveAgent.getLocation(self.board)
             self.handleButton(x, y, 0)
-
-            self.board.makeMove(x, y, 0)
+            self.numOfTurn += 1
+            if self.board.makeMove(x, y, 0) == 0:
+                self.noti("Winner is", "Player 0")
+                self.newGame()
             self.prevTurn = 0
-            #self.currentTurn ^= 1
-            #print("turn", self.currentTurn)
         print("board turn", self.board.currentTurn)
         print("visual turn", self.currentTurn)
         print("map", self.board.board)
+        if self.board.isFull():
+            self.noti("", "Draw!!!")
+            self.newGame()
 
     def handleButton(self, x, y, playerId):
         if playerId == 1:
@@ -185,6 +195,7 @@ class BoardVisualizaion(tk.Tk):
         self.currentTurn = 1
         self.prevTurn = 0
         self.validCurrentMove = True
+        self.numOfTurn = 0
 
 
 class Board():
@@ -271,15 +282,15 @@ class Board():
                 return 0
         return 2
 
-    def isFull(self, x, y):
+    def isFull(self):
         for i in range(self.width):
             for j in range(self.height):
                 if self.board[i][j] == 2:
                     return False
         return True
 
-    def isEmpty(self, x, y):
-        return not self.isFull(x, y, playerId)
+    def isEmpty(self):
+        return not self.isFull()
 
     def isWin(self, playerId):
         for x in range(self.width):

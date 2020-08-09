@@ -1,5 +1,7 @@
 #from game import Board
 from copy import deepcopy
+
+
 class Player():
     HUMAN = True
     AI = False
@@ -38,27 +40,27 @@ def heuristic(currBoard, playerID):
 
     for i in range(int(currBoard.countThreeContinousNoBound(playerID))):
         if (playerID == Player.HUMAN):
-            score += 100
+            score += 10000
         else:
-            score -= 100
+            score -= 10000
 
     for i in range(int(currBoard.countThreeContinousBound(playerID))):
         if (playerID == Player.HUMAN):
-            score += 80
+            score += 800
         else:
-            score -= 80
+            score -= 800
 
     for i in range(int(currBoard.countTwoContinousNoBound(playerID))):
         if (playerID == Player.HUMAN):
-            score += 30
+            score += 250
         else:
-            score -= 30
+            score -= 250
 
     for i in range(int(currBoard.countTwoContinousBound(playerID))):
         if (playerID == Player.HUMAN):
-            score += 10
+            score += 100
         else:
-            score -= 10
+            score -= 100
 
     return score
 
@@ -71,6 +73,25 @@ class MultiAgentSearchAgent(Agent):
         self.depth = int(depth)
 
 
+class LookupTableAgent(MultiAgentSearchAgent):
+    def getLocation(self, board):
+        empty = board.getEmptySpace()
+        print("empty", empty)
+        width = board.width
+        height = board.height
+        lookupValue = [[height//2, width//2],
+                       [height//2, width//2+1], [height//2, width//2-1],
+                       [height//2+1, width//2], [height//2-1, width//2],
+                       [height//2-1, width//2-1], [height//2+1, width//2+1],
+                       [height//2, width-1], [height-1, width//2],
+                       [0, width//2], [height//2, 0],
+                       [0, 0], [height-1, width-1]]
+        for act in lookupValue:
+            if tuple(act) in empty:
+                print(act)
+                return act
+
+
 class MinimaxAgent(MultiAgentSearchAgent):
 
     def getLocation(self, board):
@@ -79,7 +100,8 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 return self.evaluationFunction(currBoard, player)
             val = -99_999_999
             for action in currBoard.getEmptySpace():
-                val = max(val, minValue(currBoard.set(action[0], action[1], player), not player, currDepth))
+                val = max(val, minValue(currBoard.set(
+                    action[0], action[1], player), not player, currDepth))
             return val
 
         def minValue(currBoard, player, currDepth):
@@ -87,16 +109,19 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 return self.evaluationFunction(currBoard, player)
             val = 99_999_999
             for action in currBoard.getEmptySpace():
-                val = min(val, maxValue(currBoard.set(action[0], action[1], player), not player, currDepth + 1))
+                val = min(val, maxValue(currBoard.set(
+                    action[0], action[1], player), not player, currDepth + 1))
             return val
 
         # Initial call:
         act = board.getEmptySpace()[0]
-        maxVal = minValue(board.set(act[0], act[1], self.player), not self.player, 0)
+        maxVal = minValue(
+            board.set(act[0], act[1], self.player), not self.player, 0)
         for action in board.getEmptySpace():
             if action == board.getEmptySpace()[0]:
                 continue
-            currVal = minValue(board.set(action[0], action[1], self.player), not self.player, 0)
+            currVal = minValue(
+                board.set(action[0], action[1], self.player), not self.player, 0)
             if currVal > maxVal:
                 maxVal = currVal
                 act = action
@@ -109,7 +134,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
         Returns the minimax action using self.depth and self.evaluationFunction
         """
-        "*** YOUR CODE HERE ***"
+        "* YOUR CODE HERE *"
         def maxValue(currBoard, player, currDepth, alpha, beta):
             if currDepth >= self.depth or currBoard.isWin(player) or currBoard.isLose(player):
                 return self.evaluationFunction(currBoard, player)
