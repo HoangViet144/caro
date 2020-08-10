@@ -132,7 +132,7 @@ class BoardVisualizaion(tk.Tk):
     def play(self, x, y):
         if self.prevTurn == self.currentTurn:
             curTurn = "Not your turn. Current turn: hahaa"
-            if self.currentTurn == 1:
+            if self.currentTurn == 0:
                 curTurn += "Player 1"
             else:
                 curTurn += "Player 0"
@@ -293,199 +293,209 @@ class Board():
         return not self.isFull()
 
     def isWin(self, playerId):
-        for x in range(self.width):
-            for y in range(self.height):
-                # horizontal line
-                cnt = 0
-                ind = 0
-                while ind + y < self.width:
-                    if self.board[x][y+ind] != playerId:
-                        break
-                    cnt += 1
-                    ind += 1
-                ind = 1
-                while y - ind >= 0:
-                    if self.board[x][y-ind] != playerId:
-                        break
-                    cnt += 1
-                    ind += 1
-                if cnt >= 4:
+        for i in range(self.height):
+            for j in range(self.width-3):
+                check = True
+                for t in range(4):
+                    if self.board[i][j+t] != playerId:
+                        check = False
+                if check:
                     return True
-                # vertical line
-                cnt = 0
-                ind = 0
-                while x + ind < self.height:
-                    if self.board[x+ind][y] != playerId:
-                        break
-                    cnt += 1
-                    ind += 1
-                ind = 1
-                while x - ind >= 0:
-                    if self.board[x-ind][y] != playerId:
-                        break
-                    cnt += 1
-                    ind += 1
-                if cnt >= 4:
+        for i in range(self.width):
+            for j in range(self.height-3):
+                check = True
+                for t in range(4):
+                    if self.board[j+t][i] != playerId:
+                        check = False
+                if check:
                     return True
-                # diagonal line
-                cnt = 0
-                ind = 0
-                while x + ind < self.height and y+ind < self.width:
-                    if self.board[x+ind][y+ind] != playerId:
-                        break
-                    cnt += 1
-                    ind += 1
-                ind = 1
-                while x - ind >= 0 and y - ind >= 0:
-                    if self.board[x-ind][y-ind] != playerId:
-                        break
-                    cnt += 1
-                    ind += 1
-                if cnt >= 4:
+        for i in range(self.height-3):
+            for j in range(self.width-3):
+                check = True
+                for t in range(4):
+                    if self.board[i+t][j+t] != playerId:
+                        check = False
+                if check:
                     return True
-                # diagonal line
-                cnt = 0
-                ind = 0
-                while x + ind < self.height and y-ind >= 0:
-                    if self.board[x+ind][y-ind] != playerId:
-                        break
-                    cnt += 1
-                    ind += 1
-                ind = 1
-                while x - ind >= 0 and y + ind < self.width:
-                    if self.board[x-ind][y+ind] != playerId:
-                        break
-                    cnt += 1
-                    ind += 1
-                if cnt >= 4:
+        for i in range(3, self.width):
+            for j in range(self.width-3):
+                check = True
+                for t in range(4):
+                    if self.board[i-t][j+t] != playerId:
+                        check = False
+                if check:
                     return True
-        return False
+        for i in range(self.height-3):
+            for j in range(3, self.width):
+                check = True
+                for t in range(4):
+                    if self.board[i+t][j-t] != playerId:
+                        check = False
+                if check:
+                    return True
+        for i in range(3, self.width):
+            for j in range(3, self.width):
+                check = True
+                for t in range(4):
+                    if self.board[i-t][j-t] != playerId:
+                        check = False
+                if check:
+                    return True
 
     def isLose(self, playerId):
         return self.isWin(playerId ^ 1)
 
-    def isThreeContinous(self, x, y, playerId, opt):
-        # opt 1: no bound
-        # opt 2: bound
-        if x < 0 or x >= self.width or y < 0 or y >= self.height:
-            return False
+    def cntNContinuous(self, playerId, n, opt):
+        # opt 1 no bound
+        # opt 2 bound
+        # n: n consecutive cell
+        cntConsecutive = 0
+        for i in range(self.height):
+            rowConsecutive = [-1]
+            for j in range(self.width):
+                if self.board[i][j] == playerId:
+                    if rowConsecutive[-1] == -1:
+                        rowConsecutive.append(1)
+                    else:
+                        rowConsecutive[-1] += 1
+                elif self.board[i][j] == 2:
+                    rowConsecutive.append(0)
+                else:
+                    rowConsecutive.append(-1)
+            rowConsecutive.append(-1)
 
-        # ngang
-        cntBound = 0
-        cnt = 0
-        ind = 0
-        while x + ind < self.width:
-            if self.board[x+ind][y] != playerId:
-                if self.board[x+ind][y] == playerId ^ 1:
-                    cntBound += 1
-                break
-            cnt += 1
-            ind += 1
-        if x + ind == self.width:
-            cntBound += 1
-        ind = 1
-        while x-ind >= 0:
-            if self.board[x-ind][y] != playerId:
-                if self.board[x-ind][y] == playerId ^ 1:
-                    cntBound += 1
-                break
-            cnt += 1
-            ind += 1
-        if x - ind < 0:
-            cntBound += 1
-        if cnt >= 3 and opt == 1 and cntBound == 0:
-            return True
-        if cnt >= 3 and opt == 2 and cntBound == 1:
-            return True
+            for j in range(len(rowConsecutive)):
+                if rowConsecutive[j] == n:
+                    if opt == 1:
+                        if rowConsecutive[j-1] != -1 and rowConsecutive[j+1] != -1:
+                            cntConsecutive += 1
+                    if opt == 2:
+                        if rowConsecutive[j-1] != -1 or rowConsecutive[j+1] != -1:
+                            cntConsecutive += 1
+        ###########
+        for i in range(self.width):
+            rowConsecutive = [-1]
+            for j in range(self.height):
+                if self.board[j][i] == playerId:
+                    if rowConsecutive[-1] == -1:
+                        rowConsecutive.append(1)
+                    else:
+                        rowConsecutive[-1] += 1
+                elif self.board[j][i] == 2:
+                    rowConsecutive.append(0)
+                else:
+                    rowConsecutive.append(-1)
+            rowConsecutive.append(-1)
 
-        # doc
-        cntBound = 0
-        cnt = 0
-        ind = 0
-        while y + ind < self.height:
-            if self.board[x][y+ind] != playerId:
-                if self.board[x][y+ind] == playerId ^ 1:
-                    cntBound += 1
-                break
-            cnt += 1
-            ind += 1
-        if y + ind == self.height:
-            cntBound += 1
-        ind = 1
-        while y-ind >= 0:
-            if self.board[x][y-ind] != playerId:
-                if self.board[x][y-ind] == playerId ^ 1:
-                    cntBound += 1
-                break
-            cnt += 1
-            ind += 1
-        if y - ind < 0:
-            cntBound += 1
+            for j in range(len(rowConsecutive)):
+                if rowConsecutive[j] == n:
+                    if opt == 1:
+                        if rowConsecutive[j-1] != -1 and rowConsecutive[j+1] != -1:
+                            cntConsecutive += 1
+                    if opt == 2:
+                        if rowConsecutive[j-1] != -1 or rowConsecutive[j+1] != -1:
+                            cntConsecutive += 1
+        ###########
+        for i in range(self.height):
+            rowConsecutive = [-1]
+            for j in range(min(self.width, self.height)):
+                if i - j < 0 or 0 + j >= self.width:
+                    break
+                if self.board[i - j][0 + j] == playerId:
+                    if rowConsecutive[-1] == -1:
+                        rowConsecutive.append(1)
+                    else:
+                        rowConsecutive[-1] += 1
+                elif self.board[i - j][0 + j] == 2:
+                    rowConsecutive.append(0)
+                else:
+                    rowConsecutive.append(-1)
+            rowConsecutive.append(-1)
 
-        if cnt >= 3 and opt == 1 and cntBound == 0:
-            return True
-        if cnt >= 3 and opt == 2 and cntBound == 1:
-            return True
-        # cheo
-        cntBound = 0
-        cnt = 0
-        ind = 0
-        while x + ind < self.width and y+ind < self.height:
-            if self.board[x+ind][y+ind] != playerId:
-                if self.board[x+ind][y+ind] == playerId ^ 1:
-                    cntBound += 1
-                break
-            cnt += 1
-            ind += 1
-        if x + ind == self.width or y+ind == self.height:
-            cntBound += 1
-        ind = 1
-        while x-ind >= 0 and y - ind >= 0:
-            if self.board[x-ind][y-ind] != playerId:
-                if self.board[x-ind][y-ind] == playerId ^ 1:
-                    cntBound += 1
-                break
-            cnt += 1
-            ind += 1
-        if x - ind < 0 or y-ind < 0:
-            cntBound += 1
+            for j in range(len(rowConsecutive)):
+                if rowConsecutive[j] == n:
+                    if opt == 1:
+                        if rowConsecutive[j-1] != -1 and rowConsecutive[j+1] != -1:
+                            cntConsecutive += 1
+                    if opt == 2:
+                        if rowConsecutive[j-1] != -1 or rowConsecutive[j+1] != -1:
+                            cntConsecutive += 1
+        for i in range(1, self.width):
+            rowConsecutive = [-1]
+            for j in range(min(self.width, self.height)):
+                if i + j >= self.width or self.height - 1 - j < 0:
+                    break
+                if self.board[self.height - 1 - j][i + j] == playerId:
+                    if rowConsecutive[-1] == -1:
+                        rowConsecutive.append(1)
+                    else:
+                        rowConsecutive[-1] += 1
+                elif self.board[i - j][0 + j] == 2:
+                    rowConsecutive.append(0)
+                else:
+                    rowConsecutive.append(-1)
+            rowConsecutive.append(-1)
 
-        if cnt >= 3 and opt == 1 and cntBound == 0:
-            return True
-        if cnt >= 3 and opt == 2 and cntBound == 1:
-            return True
+            for j in range(len(rowConsecutive)):
+                if rowConsecutive[j] == n:
+                    if opt == 1:
+                        if rowConsecutive[j-1] != -1 and rowConsecutive[j+1] != -1:
+                            cntConsecutive += 1
+                    if opt == 2:
+                        if rowConsecutive[j-1] != -1 or rowConsecutive[j+1] != -1:
+                            cntConsecutive += 1
+        #########
+        for i in range(self.height):
+            rowConsecutive = [-1]
+            for j in range(min(self.width, self.height)):
+                if i - j < 0 or self.width - 1 - j < 0:
+                    break
+                if self.board[i - j][self.width - 1 - j] == playerId:
+                    if rowConsecutive[-1] == -1:
+                        rowConsecutive.append(1)
+                    else:
+                        rowConsecutive[-1] += 1
+                elif self.board[i - j][0 + j] == 2:
+                    rowConsecutive.append(0)
+                else:
+                    rowConsecutive.append(-1)
+            rowConsecutive.append(-1)
 
-        # cheo
-        cntBound = 0
-        cnt = 0
-        ind = 0
-        while x + ind < self.width and y-ind >= 0:
-            if self.board[x+ind][y-ind] != playerId:
-                if self.board[x+ind][y-ind] == playerId ^ 1:
-                    cntBound += 1
-                break
-            cnt += 1
-            ind += 1
-        if x + ind == self.width or y-ind < 0:
-            cntBound += 1
-        ind = 1
-        while x-ind >= 0 and y + ind < self.width:
-            if self.board[x-ind][y+ind] != playerId:
-                if self.board[x-ind][y+ind] == playerId ^ 1:
-                    cntBound += 1
-                break
-            cnt += 1
-            ind += 1
-        if x - ind < 0 or y+ind == self.width:
-            cntBound += 1
+            for j in range(len(rowConsecutive)):
+                if rowConsecutive[j] == n:
+                    if opt == 1:
+                        if rowConsecutive[j-1] != -1 and rowConsecutive[j+1] != -1:
+                            cntConsecutive += 1
+                    if opt == 2:
+                        if rowConsecutive[j-1] != -1 or rowConsecutive[j+1] != -1:
+                            cntConsecutive += 1
+        for i in range(0, self.width-1):
+            rowConsecutive = [-1]
+            for j in range(min(self.width, self.height)):
+                if i - j < 0 or self.height - 1 - j < 0:
+                    break
+                if self.board[self.height - 1 - j][i - j] == playerId:
+                    if rowConsecutive[-1] == -1:
+                        rowConsecutive.append(1)
+                    else:
+                        rowConsecutive[-1] += 1
+                elif self.board[i - j][0 + j] == 2:
+                    rowConsecutive.append(0)
+                else:
+                    rowConsecutive.append(-1)
+            rowConsecutive.append(-1)
 
-        if cnt >= 3 and opt == 1 and cntBound == 0:
-            return True
-        if cnt >= 3 and opt == 2 and cntBound == 1:
-            return True
-        return False
+            for j in range(len(rowConsecutive)):
+                if rowConsecutive[j] == n:
+                    if opt == 1:
+                        if rowConsecutive[j-1] != -1 and rowConsecutive[j+1] != -1:
+                            cntConsecutive += 1
+                    if opt == 2:
+                        if rowConsecutive[j-1] != -1 or rowConsecutive[j+1] != -1:
+                            cntConsecutive += 1
+        return cntConsecutive
 
-    def isTwoContinous(self, x, y, playerId, opt):
+    def isTwoContinuous(self, x, y, playerId, opt):
         # opt 1: no bound
         # opt 2: bound
         if x < 0 or x >= self.width or y < 0 or y >= self.height:
@@ -606,36 +616,16 @@ class Board():
         return False
 
     def countThreeContinousNoBound(self, playerId):
-        cnt = 0
-        for i in range(self.height):
-            for j in range(self.width):
-                if self.isThreeContinous(i, j, playerId, 1):
-                    cnt += 1
-        return cnt/3
+        return self.cntNContinuous(playerId, 3, 1)
 
     def countThreeContinousBound(self, playerId):
-        cnt = 0
-        for i in range(self.height):
-            for j in range(self.width):
-                if self.isThreeContinous(i, j, playerId, 2):
-                    cnt += 1
-        return cnt/3
+        return self.cntNContinuous(playerId, 3, 2)
 
     def countTwoContinousNoBound(self, playerId):
-        cnt = 0
-        for i in range(self.height):
-            for j in range(self.width):
-                if self.isTwoContinous(i, j, playerId, 1):
-                    cnt += 1
-        return cnt/2
+        return self.cntNContinuous(playerId, 2, 1)
 
     def countTwoContinousBound(self, playerId):
-        cnt = 0
-        for i in range(self.height):
-            for j in range(self.width):
-                if self.isTwoContinous(i, j, playerId, 2):
-                    cnt += 1
-        return cnt/2
+        return self.cntNContinuous(playerId, 2, 2)
 
 
 class Game:

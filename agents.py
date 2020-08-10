@@ -58,7 +58,7 @@ def heuristic(currBoard, playerID):
 
 class MultiAgentSearchAgent():
 
-    def __init__(self, depth='1'):
+    def __init__(self, depth='2'):
         self.player = Player.AI
         self.evaluationFunction = heuristic
         self.depth = int(depth)
