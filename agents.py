@@ -23,16 +23,48 @@ def pprint_tree(node, file=None, _prefix="", _last=True):
         pprint_tree(child, file, _prefix, _last)
 
 
-def heuristic(currBoard, playerID):
+def heuristic(currBoard, playerID,x,y):
     score = 0
-    # if (playerID == Player.HUMAN):
-    #     score += 1
-    # else:
-    #     score -= 1
+    # _4AI = currBoard.cntNContinuous(Player.AI,4,1) + currBoard.cntNContinuous(Player.AI,4,2)
+    # _4HU = currBoard.cntNContinuous(Player.HUMAN,4,1) + currBoard.cntNContinuous(Player.HUMAN,4,2)
+    # open3AI = currBoard.cntNContinuous(Player.AI,3,1)
+    # open3HU = currBoard.cntNContinuous(Player.HUMAN,3,1)
+    # half3AI = currBoard.cntNContinuous(Player.AI,3,2)
+    # half3HU = currBoard.cntNContinuous(Player.HUMAN,3,2)
+    # open2AI = currBoard.cntNContinuous(Player.AI,2,1)
+    # open2HU = currBoard.cntNContinuous(Player.HUMAN,2,1)
+    # half2AI = currBoard.cntNContinuous(Player.AI,2,2)
+    # half2HU = currBoard.cntNContinuous(Player.HUMAN,2,2)
+
     if (currBoard.isWin(Player.AI)):
-        score += 99_999_999
+        score += 999_999_999
     if (currBoard.isWin(Player.HUMAN)):
-        score -= 99_999_999
+        score -= 999_999_999
+    
+    '''
+    #Xet chan
+    #Viet them ham def BoundedTwoBy(x,y) bên board trả về kiểu int là số đường 2 bị chặn bởi (x,y)
+    #Viet them ham def BoundedThreeBy(x,y) bên board trả về kiểu int là số đường 3 bị chặn bởi (x,y)
+    # score += BoundedTwoBy(x,y)*999_999
+    # score += BoundedThreeBy(x,y)*9_999_999
+    '''
+    
+
+
+    # # score += 6000*(_4AI - _4HU)+\
+    # #     500*(open3AI-open3HU) + 200*(half3AI - half3HU) +\
+    # #     50*(open2AI - open2HU) + 10*(half2AI - half2HU)
+    # # return score
+    # # if (currBoard.isWin(Player.AI)):
+    # #     score += 6000
+    # # if (currBoard.isWin(Player.HUMAN)):
+    # #     score -= 6000
+
+    # score = 0
+    # # if (currBoard.isWin(Player.AI)):
+    # #     score += 99_999_999
+    # # if (currBoard.isWin(Player.HUMAN)):
+    # #     score -= 99_999_999
     score += int(currBoard.countThreeContinousNoBound(Player.AI)) * \
         4*4*4 + 100*100
     score += int(currBoard.countThreeContinousBound(Player.AI))*4*4*4
@@ -43,22 +75,23 @@ def heuristic(currBoard, playerID):
     score += int(currBoard.countTwoContinousNoBound(Player.AI))*2*2
     score += int(currBoard.countTwoContinousBound(Player.AI))*2*2
 
-    score -= int(currBoard.countThreeContinousNoBound(Player.HUMAN)
-                 )*4*4*4 + 100*100
-    score -= int(currBoard.countThreeContinousBound(Player.HUMAN))*4*4*4
+    score -= int(currBoard.countTwoContinousNoBound(Player.HUMAN)
+                 )*4*4*4 + 1000
+    score -= int(currBoard.countTwoContinousBound(Player.HUMAN))*4*4*4
 
     # twoContiHU = int(currBoard.countTwoContinousNoBound(
     #     Player.HUMAN)) + int(currBoard.countTwoContinousBound(Player.HUMAN))
     # score -= twoContiHU*2*2
-    score -= int(currBoard.countTwoContinousNoBound(Player.HUMAN))*2*2
-    score -= int(currBoard.countTwoContinousBound(Player.HUMAN))*2*2
+    score -= int(currBoard.countThreeContinousNoBound(Player.HUMAN))*2*2
+    score -= int(currBoard.countThreeContinousBound(Player.HUMAN))*2*2
 
     return score
 
 
+
 class MultiAgentSearchAgent():
 
-    def __init__(self, depth='2'):
+    def __init__(self, depth='1'):
         self.player = Player.AI
         self.evaluationFunction = heuristic
         self.depth = int(depth)
