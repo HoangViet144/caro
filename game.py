@@ -1,7 +1,5 @@
 import tkinter as tk
 from functools import partial
-import threading
-import socket
 from tkinter import messagebox
 import argparse
 import sys
@@ -31,22 +29,26 @@ class StartScreen(tk.Tk):
     def buildFrame(self):
         title = tk.Frame(self)
         title.pack()
-        fontStyle = tkFont.Font(size=15)
+        imgFrame = tk.Frame(self)
+        imgFrame.pack()
+        body = tk.Frame(self)
+        body.pack()
+        optionFrame = tk.Frame(self)
+        optionFrame.pack()
+
         vnu = tk.Label(
             title, text="VIETNAM NATIONAL UNIVERSITY - HO CHI MINH CITY", font=tkFont.Font(size=14), foreground="blue").grid(row=0)
         hmcut = tk.Label(
             title, text="HO CHI MINH CITY UNIVERSITY OF TECHNOLOGY", font=tkFont.Font(size=14), foreground="blue").grid()
         cse = tk.Label(
-            title, text="COMPUTER SCIENCE AND ENGINEERING FACULTY", foreground="blue").grid()
-        imgFrame = tk.Frame(self)
-        imgFrame.pack()
+            title, text="COMPUTER SCIENCE AND ENGINEERING FACULTY", font=tkFont.Font(size=12), foreground="blue").grid()
+
         image = Image.open("hcmut.png")
         image = image.resize((200, 200), Image.ANTIALIAS)
         self.my_img = ImageTk.PhotoImage(image)
         imgLabel = tk.Label(imgFrame, image=self.my_img)
         imgLabel.grid()
-        body = tk.Frame(self)
-        body.pack()
+
         subject = tk.Label(body, text="CO306A Introduction to AI").grid()
         _ = tk.Label(
             body, text="____________________________________________________________").grid()
@@ -56,14 +58,26 @@ class StartScreen(tk.Tk):
             body, text="____________________________________________________________").grid()
         a = tk.Label(body,
                      text="Choose what kind of play do you prefer:").grid(pady=20)
-        optionFrame = tk.Frame(self)
-        optionFrame.pack()
-        onePlayerButton = tk.Button(optionFrame, text="1 player", width=10, command=partial(
+
+        def on_enter1(e):
+            onePlayerButton['background'] = 'blue'
+
+        def on_enter2(e):
+            twoPlayerButton['background'] = 'blue'
+
+        def on_leave(e):
+            onePlayerButton['background'] = 'DeepSkyBlue2'
+            twoPlayerButton['background'] = 'DeepSkyBlue2'
+        onePlayerButton = tk.Button(optionFrame, bg='DeepSkyBlue2', text="1 player", width=10, command=partial(
             self.onePlayer))
         onePlayerButton.grid(row=11, column=0, padx=30)
-        twoPlayerButton = tk.Button(optionFrame, text="2 player", width=10, command=partial(
+        twoPlayerButton = tk.Button(optionFrame, bg='DeepSkyBlue2', text="2 player", width=10, command=partial(
             self.twoPlayer))
         twoPlayerButton.grid(row=11, column=1, padx=30)
+        onePlayerButton.bind("<Enter>", on_enter1)
+        onePlayerButton.bind("<Leave>", on_leave)
+        twoPlayerButton.bind("<Enter>", on_enter2)
+        twoPlayerButton.bind("<Leave>", on_leave)
 
     def onePlayer(self):
         self.destroy()
@@ -71,7 +85,7 @@ class StartScreen(tk.Tk):
         board.buildFrame()
         board.frameControl.pack_forget()
         a = tk.Label(board.frameLabel,
-                     text="Player 1 (YOU): X, Player 0 (AI): O. You play first!").grid()
+                     text="Player 1 (YOU): X, Player 0 (AI): O. You play first!", font=tkFont.Font(size=12)).grid()
         board.mainloop()
 
     def twoPlayer(self):
@@ -79,7 +93,7 @@ class StartScreen(tk.Tk):
         board = BoardVisualizaion(self.agent, 2)
         board.buildFrame()
         a = tk.Label(board.frameLabel,
-                     text="Player 1: X, Player 0: O. First player: Player1").grid()
+                     text="Player 1: X, Player 0: O. First player: Player1", font=tkFont.Font(size=12)).grid()
         board.mainloop()
 
 
@@ -110,13 +124,43 @@ class BoardVisualizaion(tk.Tk):
         frameControl.pack()
         frameBoard = tk.Frame(self)
         frameBoard.pack()
+        frameOpt = tk.Frame(self)
+        frameOpt.pack()
         self.frameBoard = frameBoard
         self.frameControl = frameControl
         self.frameLabel = frameLabel
+        self.frameOpt = frameOpt
+
+        def on_enter(e):
+            quitButton['background'] = 'red3'
+
+        def on_enter1(e):
+            switchButton['background'] = 'forest green'
+
+        def on_enter2(e):
+            newButton['background'] = 'goldenrod'
+
+        def on_leave(e):
+            quitButton['background'] = 'red'
+            switchButton['background'] = 'spring green'
+            newButton['background'] = 'yellow'
 
         switchButton = tk.Button(
-            frameControl, text="Switch turn", width=10, command=partial(self.switchTurn))
+            frameControl, text="Switch turn", width=10, command=partial(self.switchTurn), bg="spring green")
         switchButton.grid(row=0, column=0, padx=30)
+        newButton = tk.Button(
+            frameOpt, text="New Game", width=10, command=partial(self.newGame), bg='yellow')
+        newButton.grid(row=0, column=0, padx=30)
+        quitButton = tk.Button(
+            frameOpt, text="Quit Game", width=10, command=self.destroy, bg='red')
+        quitButton.grid(row=0, column=1, padx=30)
+        quitButton.bind("<Enter>", on_enter)
+        quitButton.bind("<Leave>", on_leave)
+        switchButton.bind("<Enter>", on_enter1)
+        switchButton.bind("<Leave>", on_leave)
+        newButton.bind("<Enter>", on_enter2)
+        newButton.bind("<Leave>", on_leave)
+
         for x in range(self.height):
             for y in range(self.width):
                 self.button[x][y] = tk.Button(frameBoard, font=('arial', 15, 'bold'), height=1, width=2,
@@ -131,7 +175,7 @@ class BoardVisualizaion(tk.Tk):
 
     def play(self, x, y):
         if self.prevTurn == self.currentTurn:
-            curTurn = "Not your turn. Current turn: hahaa"
+            curTurn = "Not your turn. Current turn: "
             if self.currentTurn == 0:
                 curTurn += "Player 1"
             else:
@@ -152,7 +196,7 @@ class BoardVisualizaion(tk.Tk):
             self.validCurrentMove = True
             self.prevTurn = self.currentTurn
         else:
-            self.noti("", "not empty cell")
+            self.noti("", "Ndot empty cell")
             self.validCurrentMove = False
             return
         print("c", self.currentTurn)
@@ -200,17 +244,10 @@ class BoardVisualizaion(tk.Tk):
 
 class Board():
     def __init__(self,  width=6, height=6):
-        # super().__init__()
         self.width = width
         self.height = height
-        # self.title("Fight with AI Caro CSE HCMUT")
-        # self.geometry('500x350')
         self.board = [[2 for i in range(width)] for j in range(height)]
-        # self.button = [[2 for i in range(width)] for j in range(height)]
         self.currentTurn = 1
-
-    def noti(self, title, msg):
-        messagebox.showinfo(str(title), str(msg))
 
     def getEmptySpace(self):
         emp = []
@@ -233,47 +270,21 @@ class Board():
         self.currentTurn = 1
 
     def set(self, x, y, playerId):
-        """
-        if self.currentTurn != playerId:
-            # not playerId turn
-            curTurn = "Not your turn. Current turn: "
-            if self.currentTurn == 1:
-                curTurn += "Player 1"
-            else:
-                curTurn += "Player 0000"
-            self.noti("", curTurn)
-            print("not your turn")
-            print(self.currentTurn)
-            return -1
-        """
         if self.board[x][y] != 2:
             # cell not empty
-            print("self not empty")
+            print("Cell not empty")
             return -1
         curBoard = copy.deepcopy(self)
         curBoard.board[x][y] = self.currentTurn
         return curBoard
 
     def makeMove(self, x, y, playerId):
-        """
-        if self.currentTurn != playerId:
-            # not playerId turn
-            curTurn = "Not your turn. Current turn: "
-            if self.currentTurn == 1:
-                curTurn += "Player 1"
-            else:
-                curTurn += "Player 0"
-            self.noti("", curTurn)
-            print("not your turn")
-            return -1
-        """
         if self.board[x][y] != 2:
             # cell not empty
-            print("self not empty")
+            print("Cell not empty")
             return -1
         self.board[x][y] = self.currentTurn
         self.currentTurn ^= 1
-        print(self.currentTurn)
 
         if self.isWin(playerId):
             if playerId == 1:
