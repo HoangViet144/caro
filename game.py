@@ -158,7 +158,7 @@ class BoardVisualizaion(tk.Tk):
         print("c", self.currentTurn)
         if self.gameType == 1:
             print("Ai turn")
-            if self.numOfTurn >= 2:
+            if self.numOfTurn >= 1:
                 x, y = self.agent.getLocation(self.board)
             else:
                 naiveAgent = LookupTableAgent()

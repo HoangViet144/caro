@@ -1,15 +1,18 @@
 #from game import Board
 from copy import deepcopy
 
+
 class Player():
     HUMAN = True
     AI = False
+
 
 class Node:
     def __init__(self, value=None, children=None):
         if children is None:
             children = []
         self.value, self.children = value, children
+
 
 def pprint_tree(node, file=None, _prefix="", _last=True):
     print(_prefix, "`- " if _last else "|- ", node.value, sep="", file=file)
@@ -19,41 +22,36 @@ def pprint_tree(node, file=None, _prefix="", _last=True):
         _last = i == (child_count - 1)
         pprint_tree(child, file, _prefix, _last)
 
+
 def heuristic(currBoard, playerID):
     score = 0
-    if (playerID == Player.HUMAN):
-        score += 1
-    else:
-        score -= 1
-    if (currBoard.isWin(playerID)):
-        if (playerID == Player.HUMAN):
-            score += 99_999_999
-        else:
-            score -= 99_999_999
+    # if (playerID == Player.HUMAN):
+    #     score += 1
+    # else:
+    #     score -= 1
+    if (currBoard.isWin(Player.AI)):
+        score += 99_999_999
+    if (currBoard.isWin(Player.HUMAN)):
+        score -= 99_999_999
+    score += int(currBoard.countThreeContinousNoBound(Player.AI)) * \
+        4*4*4 + 100*100
+    score += int(currBoard.countThreeContinousBound(Player.AI))*4*4*4
 
-    for i in range(int(currBoard.countThreeContinousNoBound(playerID))):
-        if (playerID == Player.HUMAN):
-            score += 10000
-        else:
-            score -= 10000
+    # twoContiAI = int(currBoard.countTwoContinousNoBound(
+    #     Player.AI)) + int(currBoard.countTwoContinousBound(Player.AI))
+    # score += twoContiAI*2*2
+    score += int(currBoard.countTwoContinousNoBound(Player.AI))*2*2
+    score += int(currBoard.countTwoContinousBound(Player.AI))*2*2
 
-    for i in range(int(currBoard.countThreeContinousBound(playerID))):
-        if (playerID == Player.HUMAN):
-            score += 800
-        else:
-            score -= 800
+    score -= int(currBoard.countThreeContinousNoBound(Player.HUMAN)
+                 )*4*4*4 + 100*100
+    score -= int(currBoard.countThreeContinousBound(Player.HUMAN))*4*4*4
 
-    for i in range(int(currBoard.countTwoContinousNoBound(playerID))):
-        if (playerID == Player.HUMAN):
-            score += 250
-        else:
-            score -= 250
-
-    for i in range(int(currBoard.countTwoContinousBound(playerID))):
-        if (playerID == Player.HUMAN):
-            score += 100
-        else:
-            score -= 100
+    # twoContiHU = int(currBoard.countTwoContinousNoBound(
+    #     Player.HUMAN)) + int(currBoard.countTwoContinousBound(Player.HUMAN))
+    # score -= twoContiHU*2*2
+    score -= int(currBoard.countTwoContinousNoBound(Player.HUMAN))*2*2
+    score -= int(currBoard.countTwoContinousBound(Player.HUMAN))*2*2
 
     return score
 
@@ -92,11 +90,12 @@ class MinimaxAgent(MultiAgentSearchAgent):
             node = Node(value=str(currAction))
             if currDepth >= self.depth or currBoard.isWin(player) or currBoard.isLose(player):
                 val = self.evaluationFunction(currBoard, player)
-                # return 
+                # return
             else:
                 val = -99_999_999
                 for action in currBoard.getEmptySpace():
-                    tempVal = minValue(currBoard.set(action[0], action[1], player), not player, currDepth, action, node)
+                    tempVal = minValue(currBoard.set(
+                        action[0], action[1], player), not player, currDepth, action, node)
                     # node.children.append(tempNode)
                     val = max(val, tempVal)
                 # print("Minimax-->MAX agent: Visited node = ", currAction, ", Value = ", val)
@@ -108,11 +107,12 @@ class MinimaxAgent(MultiAgentSearchAgent):
             node = Node(value=str(currAction))
             if currDepth >= self.depth or currBoard.isWin(player) or currBoard.isLose(player):
                 val = self.evaluationFunction(currBoard, player)
-                # return 
+                # return
             else:
                 val = 99_999_999
                 for action in currBoard.getEmptySpace():
-                    tempVal = maxValue(currBoard.set(action[0], action[1], player), not player, currDepth + 1, action, node)
+                    tempVal = maxValue(currBoard.set(
+                        action[0], action[1], player), not player, currDepth + 1, action, node)
                     # node.children.append(tempNode)
                     val = min(val, tempVal)
                 # print("Minimax-->MIN agent: Visited node = ", currAction, ", Value = ", val)
@@ -123,11 +123,13 @@ class MinimaxAgent(MultiAgentSearchAgent):
         # Initial call:
         act = board.getEmptySpace()[0]
         root = Node()
-        maxVal = minValue(board.set(act[0], act[1], self.player), not self.player, 0, act, root)
+        maxVal = minValue(
+            board.set(act[0], act[1], self.player), not self.player, 0, act, root)
         for action in board.getEmptySpace():
             if action == board.getEmptySpace()[0]:
                 continue
-            currVal = minValue(board.set(action[0], action[1], self.player), not self.player, 0, action, root)
+            currVal = minValue(
+                board.set(action[0], action[1], self.player), not self.player, 0, action, root)
             if currVal > maxVal:
                 maxVal = currVal
                 act = action
