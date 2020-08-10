@@ -1,30 +1,23 @@
 #from game import Board
 from copy import deepcopy
 
-
 class Player():
     HUMAN = True
     AI = False
 
+class Node:
+    def __init__(self, value=None, children=None):
+        if children is None:
+            children = []
+        self.value, self.children = value, children
 
-class Agent:
-    """
-    An agent must define a getAction method, but may also define the
-    following methods which will be called if they exist:
-
-    def registerInitialState(self, state): # inspects the starting state
-    """
-
-    def __init__(self, index=0):
-        self.index = index
-
-    def getAction(self, state):
-        """
-        The Agent will receive a GameState (from either {pacman, capture, sonar}.py) and
-        must return an action from Directions.{North, South, East, West, Stop}
-        """
-        raiseNotDefined()
-
+def pprint_tree(node, file=None, _prefix="", _last=True):
+    print(_prefix, "`- " if _last else "|- ", node.value, sep="", file=file)
+    _prefix += "   " if _last else "|  "
+    child_count = len(node.children)
+    for i, child in enumerate(node.children):
+        _last = i == (child_count - 1)
+        pprint_tree(child, file, _prefix, _last)
 
 def heuristic(currBoard, playerID):
     score = 0
@@ -65,7 +58,7 @@ def heuristic(currBoard, playerID):
     return score
 
 
-class MultiAgentSearchAgent(Agent):
+class MultiAgentSearchAgent():
 
     def __init__(self, depth='1'):
         self.player = Player.AI
@@ -95,37 +88,51 @@ class LookupTableAgent(MultiAgentSearchAgent):
 class MinimaxAgent(MultiAgentSearchAgent):
 
     def getLocation(self, board):
-        def maxValue(currBoard, player, currDepth):
+        def maxValue(currBoard, player, currDepth, currAction, parent):
+            node = Node(value=str(currAction))
             if currDepth >= self.depth or currBoard.isWin(player) or currBoard.isLose(player):
-                return self.evaluationFunction(currBoard, player)
-            val = -99_999_999
-            for action in currBoard.getEmptySpace():
-                val = max(val, minValue(currBoard.set(
-                    action[0], action[1], player), not player, currDepth))
+                val = self.evaluationFunction(currBoard, player)
+                # return 
+            else:
+                val = -99_999_999
+                for action in currBoard.getEmptySpace():
+                    tempVal = minValue(currBoard.set(action[0], action[1], player), not player, currDepth, action, node)
+                    # node.children.append(tempNode)
+                    val = max(val, tempVal)
+                # print("Minimax-->MAX agent: Visited node = ", currAction, ", Value = ", val)
+            node.value += ' ' + str(val)
+            parent.children.append(node)
             return val
 
-        def minValue(currBoard, player, currDepth):
+        def minValue(currBoard, player, currDepth, currAction, parent):
+            node = Node(value=str(currAction))
             if currDepth >= self.depth or currBoard.isWin(player) or currBoard.isLose(player):
-                return self.evaluationFunction(currBoard, player)
-            val = 99_999_999
-            for action in currBoard.getEmptySpace():
-                val = min(val, maxValue(currBoard.set(
-                    action[0], action[1], player), not player, currDepth + 1))
+                val = self.evaluationFunction(currBoard, player)
+                # return 
+            else:
+                val = 99_999_999
+                for action in currBoard.getEmptySpace():
+                    tempVal = maxValue(currBoard.set(action[0], action[1], player), not player, currDepth + 1, action, node)
+                    # node.children.append(tempNode)
+                    val = min(val, tempVal)
+                # print("Minimax-->MIN agent: Visited node = ", currAction, ", Value = ", val)
+            node.value += ' ' + str(val)
+            parent.children.append(node)
             return val
 
         # Initial call:
         act = board.getEmptySpace()[0]
-        maxVal = minValue(
-            board.set(act[0], act[1], self.player), not self.player, 0)
+        root = Node()
+        maxVal = minValue(board.set(act[0], act[1], self.player), not self.player, 0, act, root)
         for action in board.getEmptySpace():
             if action == board.getEmptySpace()[0]:
                 continue
-            currVal = minValue(
-                board.set(action[0], action[1], self.player), not self.player, 0)
+            currVal = minValue(board.set(action[0], action[1], self.player), not self.player, 0, action, root)
             if currVal > maxVal:
                 maxVal = currVal
                 act = action
-
+        root.value = str(act) + ' ' + str(maxVal)
+        pprint_tree(root)
         return act
 
 
