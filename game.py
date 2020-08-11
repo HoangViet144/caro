@@ -751,7 +751,13 @@ class Board():
         else:
             if (cnt == 1 and cnt1 == 2) or (cnt == 2 and cnt1 == 1):
                 res += 1
-    return res
+        return res
+
+    def BoundedTwoBy(self, x, y, playerID):
+        return self.BoundedNBy(x, y, playerID, 2)
+
+    def BoundedThreeBy(self, x, y, playerID):
+        return self.BoundedNBy(x, y, playerID, 3)
 
 
 class Game:
