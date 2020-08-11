@@ -116,6 +116,8 @@ class BoardVisualizaion(tk.Tk):
         self.prevTurn = 0
         self.validCurrentMove = True
         self.numOfTurn = 0
+        self.scorePlayer1 = 0
+        self.scorePlayer0 = 0
 
     def buildFrame(self):
         frameLabel = tk.Frame(self)
@@ -177,26 +179,32 @@ class BoardVisualizaion(tk.Tk):
         if self.prevTurn == self.currentTurn:
             curTurn = "Not your turn. Current turn: "
             if self.currentTurn == 0:
-                curTurn += "Player 1"
+                curTurn += "Player 1. Please select switch turn."
             else:
-                curTurn += "Player 0"
+                curTurn += "Player 0. Please select switch turn."
             self.noti("", curTurn)
             return
         returnVal = self.board.makeMove(x, y, self.currentTurn)
         if returnVal >= 0:
             self.handleButton(x, y, self.currentTurn)
             if returnVal == 1:
-                self.noti("Winner is", "Player 1")
+                self.scorePlayer1 += 1
+                msg = "Winner is Player1 \nScore: " + \
+                    str(self.scorePlayer1) + " - " + str(self.scorePlayer0)
+                self.noti("", msg)
                 self.newGame()
                 return
             elif returnVal == 0:
-                self.noti("Winner is", "Player 0")
+                self.scorePlayer1 += 1
+                msg = "Winner is Player0 \nScore: " + \
+                    str(self.scorePlayer1) + " - " + str(self.scorePlayer0)
+                self.noti("", msg)
                 self.newGame()
                 return
             self.validCurrentMove = True
             self.prevTurn = self.currentTurn
         else:
-            self.noti("", "Ndot empty cell")
+            self.noti("", "Not an empty cell")
             self.validCurrentMove = False
             return
         print("c", self.currentTurn)
@@ -217,7 +225,9 @@ class BoardVisualizaion(tk.Tk):
         print("visual turn", self.currentTurn)
         print("map", self.board.board)
         if self.board.isFull():
-            self.noti("", "Draw!!!")
+            msg = "Draw!!!" + \
+                str(self.scorePlayer1) + " - " + str(self.scorePlayer0)
+            self.noti("", msg)
             self.newGame()
 
     def handleButton(self, x, y, playerId):
@@ -637,6 +647,111 @@ class Board():
 
     def countTwoContinousBound(self, playerId):
         return self.cntNContinuous(playerId, 2, 2)
+
+    def BoundedNBy(self, x, y, playerID, n):
+        if x < 0 or x >= self.height or y < 0 or y > self.width:
+            return 0
+        cnt = 0
+        res = 0
+        ind = 1
+        cnt1 = 0
+        while x + ind < self.height:
+            if self.board[x+ind][y] == playerID:
+                break
+            cnt += 1
+            ind += 1
+        if cnt == n:
+            res += 1
+        ind = 1
+        while x - ind >= 0:
+            if self.board[x-ind][y] == playerID:
+                break
+            cnt1 += 1
+            ind += 1
+        if cnt1 == n:
+            res += 1
+        if n == 2:
+            if cnt == 1 and cnt1 == 1:
+                res += 1
+        else:
+            if (cnt == 1 and cnt1 == 2) or (cnt == 2 and cnt1 == 1):
+                res += 1
+        ######
+        ind = 1
+        cnt = 0
+        cnt1 = 0
+        while y + ind < self.width:
+            if self.board[x][y+ind] == playerID:
+                break
+            ind += 1
+            cnt += 1
+        if cnt == n:
+            res += 1
+        ind = 1
+        while y - ind >= 0:
+            if self.board[x][y-ind] == playerID:
+                break
+            ind += 1
+            cnt1 += 1
+        if cnt1 == n:
+            res += 1
+        if n == 2:
+            if cnt == 1 and cnt1 == 1:
+                res += 1
+        else:
+            if (cnt == 1 and cnt1 == 2) or (cnt == 2 and cnt1 == 1):
+                res += 1
+        ######
+        ind = 1
+        cnt = 0
+        cnt1 = 0
+        while x + ind < self.height and y + ind < self.width:
+            if self.board[x+ind][y+ind] == playerID:
+                break
+            ind += 1
+            cnt += 1
+        if cnt == n:
+            res += 1
+        ind = 1
+        while x - ind >= 0 and y - ind >= 0:
+            if self.board[x-ind][y-ind] == playerID:
+                break
+            ind += 1
+            cnt1 += 1
+        if cnt1 == n:
+            res += 1
+        if n == 2:
+            if cnt == 1 and cnt1 == 1:
+                res += 1
+        else:
+            if (cnt == 1 and cnt1 == 2) or (cnt == 2 and cnt1 == 1):
+                res += 1
+        ####
+        ind = 1
+        cnt = 0
+        cnt1 = 0
+        while x - ind >= 0 and y + ind < self.width:
+            if self.board[x-ind][y+ind] == playerID:
+                break
+            ind += 1
+            cnt += 1
+        if cnt == n:
+            res += 1
+        ind = 1
+        while x + ind < self.height and y - ind >= 0:
+            if self.board[x+ind][y-ind] == playerID:
+                break
+            ind += 1
+            cnt1 += 1
+        if cnt1 == n:
+            res += 1
+        if n == 2:
+            if cnt == 1 and cnt1 == 1:
+                res += 1
+        else:
+            if (cnt == 1 and cnt1 == 2) or (cnt == 2 and cnt1 == 1):
+                res += 1
+    return res
 
 
 class Game:
