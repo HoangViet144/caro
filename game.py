@@ -787,7 +787,7 @@ class Board():
         return self.BoundedNBy(x, y, playerID, 3, 1)
 
     def secondBoundedBy(self, x, y, playerID):
-        return self.BoundedNBy(x, y, playerId, 2, 2) + self.BoundedNBy(x, y, playerId, 3, 2)
+        return self.BoundedNBy(x, y, playerID, 2, 2) + self.BoundedNBy(x, y, playerID, 3, 2)
 
 
 class Game:
