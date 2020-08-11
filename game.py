@@ -648,7 +648,9 @@ class Board():
     def countTwoContinousBound(self, playerId):
         return self.cntNContinuous(playerId, 2, 2)
 
-    def BoundedNBy(self, x, y, playerID, n):
+    def BoundedNBy(self, x, y, playerID, n, opt):
+        # opt 1 one bound
+        # opt 2 two bound
         if x < 0 or x >= self.height or y < 0 or y > self.width:
             return 0
         cnt = 0
@@ -661,7 +663,10 @@ class Board():
             cnt += 1
             ind += 1
         if cnt == n:
-            res += 1
+            if opt == 1:
+                res += 1
+            if opt == 2 and x + ind < self.height and self.board[x+ind][y] == playerID:
+                res += 1
         ind = 1
         while x - ind >= 0:
             if self.board[x-ind][y] == playerID:
@@ -669,12 +674,16 @@ class Board():
             cnt1 += 1
             ind += 1
         if cnt1 == n:
-            res += 1
+            if opt == 1:
+                res += 1
+            if opt == 2 and x - ind >= 0 and self.board[x-ind][y] == playerID:
+                res += 1
+
         if n == 2:
-            if cnt == 1 and cnt1 == 1:
+            if cnt == 1 and cnt1 == 1 and opt == 1:
                 res += 1
         else:
-            if (cnt == 1 and cnt1 == 2) or (cnt == 2 and cnt1 == 1):
+            if opt == 1 and ((cnt == 1 and cnt1 == 2) or (cnt == 2 and cnt1 == 1)):
                 res += 1
         ######
         ind = 1
@@ -686,7 +695,10 @@ class Board():
             ind += 1
             cnt += 1
         if cnt == n:
-            res += 1
+            if opt == 1:
+                res += 1
+            if opt == 2 and y + ind < self.width and self.board[x][y+ind] == playerID:
+                res += 1
         ind = 1
         while y - ind >= 0:
             if self.board[x][y-ind] == playerID:
@@ -694,12 +706,15 @@ class Board():
             ind += 1
             cnt1 += 1
         if cnt1 == n:
-            res += 1
+            if opt == 1:
+                res += 1
+            if opt == 2 and y - ind >= 0 and self.board[x][y-ind] == playerID:
+                res += 1
         if n == 2:
-            if cnt == 1 and cnt1 == 1:
+            if cnt == 1 and cnt1 == 1 and opt == 1:
                 res += 1
         else:
-            if (cnt == 1 and cnt1 == 2) or (cnt == 2 and cnt1 == 1):
+            if opt == 1 and ((cnt == 1 and cnt1 == 2) or (cnt == 2 and cnt1 == 1)):
                 res += 1
         ######
         ind = 1
@@ -711,7 +726,10 @@ class Board():
             ind += 1
             cnt += 1
         if cnt == n:
-            res += 1
+            if opt == 1:
+                res += 1
+            if opt == 2 and x + ind < self.height and y + ind < self.width and self.board[x+ind][y+ind] == playerID:
+                res += 1
         ind = 1
         while x - ind >= 0 and y - ind >= 0:
             if self.board[x-ind][y-ind] == playerID:
@@ -719,12 +737,15 @@ class Board():
             ind += 1
             cnt1 += 1
         if cnt1 == n:
-            res += 1
+            if opt == 1:
+                res += 1
+            if opt == 2 and x - ind >= 0 and y - ind >= 0 and self.board[x-ind][y-ind] == playerID:
+                res += 1
         if n == 2:
-            if cnt == 1 and cnt1 == 1:
+            if cnt == 1 and cnt1 == 1 and opt == 1:
                 res += 1
         else:
-            if (cnt == 1 and cnt1 == 2) or (cnt == 2 and cnt1 == 1):
+            if opt == 1 and ((cnt == 1 and cnt1 == 2) or (cnt == 2 and cnt1 == 1)):
                 res += 1
         ####
         ind = 1
@@ -736,7 +757,10 @@ class Board():
             ind += 1
             cnt += 1
         if cnt == n:
-            res += 1
+            if opt == 1:
+                res += 1
+            if opt == 2 and x - ind >= 0 and y + ind < self.width and self.board[x-ind][y+ind] == playerID:
+                res += 1
         ind = 1
         while x + ind < self.height and y - ind >= 0:
             if self.board[x+ind][y-ind] == playerID:
@@ -744,20 +768,26 @@ class Board():
             ind += 1
             cnt1 += 1
         if cnt1 == n:
-            res += 1
+            if opt == 1:
+                res += 1
+            if opt == 2 and x + ind < self.height and y - ind >= 0 and self.board[x+ind][y-ind] == playerID:
+                res += 1
         if n == 2:
-            if cnt == 1 and cnt1 == 1:
+            if cnt == 1 and cnt1 == 1 and opt == 1:
                 res += 1
         else:
-            if (cnt == 1 and cnt1 == 2) or (cnt == 2 and cnt1 == 1):
+            if opt == 1 and ((cnt == 1 and cnt1 == 2) or (cnt == 2 and cnt1 == 1)):
                 res += 1
         return res
 
     def BoundedTwoBy(self, x, y, playerID):
-        return self.BoundedNBy(x, y, playerID, 2)
+        return self.BoundedNBy(x, y, playerID, 2, 1)
 
     def BoundedThreeBy(self, x, y, playerID):
-        return self.BoundedNBy(x, y, playerID, 3)
+        return self.BoundedNBy(x, y, playerID, 3, 1)
+
+    def secondBoundedBy(self, x, y, playerID):
+        return self.BoundedNBy(x, y, playerId, 2, 2) + self.BoundedNBy(x, y, playerId, 3, 2)
 
 
 class Game:
