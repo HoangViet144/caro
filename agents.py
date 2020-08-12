@@ -49,7 +49,7 @@ def heuristic(currBoard, playerID,action):
     score += int(currBoard.countTwoContinousBound(Player.AI))*2*2 
 
     score -= int(currBoard.countTwoContinousNoBound(Player.HUMAN)
-                 )*4*4*4 + 1000
+                 )*4*4*4 + 10000
     score -= int(currBoard.countTwoContinousBound(Player.HUMAN))*4*4*4
 
     score -= int(currBoard.countThreeContinousNoBound(Player.HUMAN))*2*2 
