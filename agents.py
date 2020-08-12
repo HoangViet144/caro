@@ -36,7 +36,7 @@ def heuristic(currBoard, playerID,action):
     score += currBoard.BoundedNBy(action[0],action[1],Player.AI,2,1)*9_999_999
     score += currBoard.BoundedNBy(action[0],action[1],Player.AI,3,2)*999_999
     score += currBoard.BoundedNBy(action[0],action[1],Player.AI,2,2)*99_999
-    score += currBoard.BoundedNBy(action[0],action[1],Player.AI,3,1)*9_999
+    #score += currBoard.BoundedNBy(action[0],action[1],Player.AI,3,1)*9_999
     
     
 
