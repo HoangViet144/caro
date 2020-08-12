@@ -207,9 +207,9 @@ class BoardVisualizaion(tk.Tk):
             self.noti("", "Not an empty cell")
             self.validCurrentMove = False
             return
-        print("c", self.currentTurn)
+        # print("c", self.currentTurn)
         if self.gameType == 1:
-            print("Ai turn")
+            # print("Ai turn")
             if self.numOfTurn >= 1:
                 x, y = self.agent.getLocation(self.board)
             else:
@@ -221,9 +221,9 @@ class BoardVisualizaion(tk.Tk):
                 self.noti("Winner is", "Player 0")
                 self.newGame()
             self.prevTurn = 0
-        print("board turn", self.board.currentTurn)
-        print("visual turn", self.currentTurn)
-        print("map", self.board.board)
+        # print("board turn", self.board.currentTurn)
+        # print("visual turn", self.currentTurn)
+        # print("map", self.board.board)
         if self.board.isFull():
             msg = "Draw!!!" + \
                 str(self.scorePlayer1) + " - " + str(self.scorePlayer0)

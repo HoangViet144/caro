@@ -25,29 +25,14 @@ def pprint_tree(node, file=None, _prefix="", _last=True):
 
 def heuristic(currBoard, playerID,action):
     score = 0
-    # _4AI = currBoard.cntNContinuous(Player.AI,4,1) + currBoard.cntNContinuous(Player.AI,4,2)
-    # _4HU = currBoard.cntNContinuous(Player.HUMAN,4,1) + currBoard.cntNContinuous(Player.HUMAN,4,2)
-    # open3AI = currBoard.cntNContinuous(Player.AI,3,1)
-    # open3HU = currBoard.cntNContinuous(Player.HUMAN,3,1)
-    # half3AI = currBoard.cntNContinuous(Player.AI,3,2)
-    # half3HU = currBoard.cntNContinuous(Player.HUMAN,3,2)
-    # open2AI = currBoard.cntNContinuous(Player.AI,2,1)
-    # open2HU = currBoard.cntNContinuous(Player.HUMAN,2,1)
-    # half2AI = currBoard.cntNContinuous(Player.AI,2,2)
-    # half2HU = currBoard.cntNContinuous(Player.HUMAN,2,2)
-
+    
+    #Xet win
     if (currBoard.isWin(Player.AI)):
         score += 999_999_999
     if (currBoard.isWin(Player.HUMAN)):
         score -= 999_999_999
     
-    '''
     #Xet chan
-    #Viet them ham def BoundedTwoBy(x,y) bên board trả về kiểu int là số đường 2 bị chặn bởi (x,y)
-    #Viet them ham def BoundedThreeBy(x,y) bên board trả về kiểu int là số đường 3 bị chặn bởi (x,y)
-    # score += BoundedTwoBy(x,y)*999_999
-    # score += BoundedThreeBy(x,y)*9_999_999
-    '''
     score += currBoard.BoundedNBy(action[0],action[1],Player.AI,2,1)*9_999_999
     score += currBoard.BoundedNBy(action[0],action[1],Player.AI,3,2)*999_999
     score += currBoard.BoundedNBy(action[0],action[1],Player.AI,2,2)*99_999
@@ -61,13 +46,13 @@ def heuristic(currBoard, playerID,action):
     score += int(currBoard.countThreeContinousBound(Player.AI))*4*4*4
 
     score += int(currBoard.countTwoContinousNoBound(Player.AI))*2*2
-    score += int(currBoard.countTwoContinousBound(Player.AI))*2*2
+    score += int(currBoard.countTwoContinousBound(Player.AI))*2*2 
 
     score -= int(currBoard.countTwoContinousNoBound(Player.HUMAN)
                  )*4*4*4 + 1000
     score -= int(currBoard.countTwoContinousBound(Player.HUMAN))*4*4*4
 
-    score -= int(currBoard.countThreeContinousNoBound(Player.HUMAN))*2*2
+    score -= int(currBoard.countThreeContinousNoBound(Player.HUMAN))*2*2 
     score -= int(currBoard.countThreeContinousBound(Player.HUMAN))*2*2
 
     return score
@@ -85,7 +70,7 @@ class MultiAgentSearchAgent():
 class LookupTableAgent(MultiAgentSearchAgent):
     def getLocation(self, board):
         empty = board.getEmptySpace()
-        print("empty", empty)
+        # print("empty", empty)
         width = board.width
         height = board.height
         lookupValue = [[height//2, width//2],
@@ -97,7 +82,7 @@ class LookupTableAgent(MultiAgentSearchAgent):
                        [0, 0], [height-1, width-1]]
         for act in lookupValue:
             if tuple(act) in empty:
-                print(act)
+                # print(act)
                 return act
 
 
