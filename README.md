@@ -1,7 +1,7 @@
 # Implement Caro Game
 
 ## Prerequisite
-You have to run this Crawler on Python with version 3.x.
+You have to run this Caro Game on Python with version 3.x.
 
 ## Pre-running
 Before running the Caro Game, there are some pre-step codes need doing first in terminal (MacOS) or cmd (Windows):
